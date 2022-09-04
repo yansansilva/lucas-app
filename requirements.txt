@@ -1,0 +1,4 @@
+openpyxl==3.0.10
+pandas==1.4.4
+streamlit==1.12.2
+XlsxWriter==3.0.3
