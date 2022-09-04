@@ -5,6 +5,10 @@ from io import BytesIO
 import xlsxwriter
 import openpyxl
 
+st.set_page_config(
+	layout="wide"
+)
+
 @st.cache
 def converter_df_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
@@ -23,9 +27,16 @@ def converter_df_excel(df):
     processed_data = output.getvalue()
     return processed_data
 
+obsvervacao = st.checkbox('Mostrar Observações')
+if observacao:
+    st.markdown('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_**
+    2 vezes, se o arquivo estiver bugado.
+    3 vezes, se o arquivo estiver normal.
+    Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa
+    Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado no formato Excel ou CSV.''')
 
 coluna_1, coluna_2, coluna_3 = st.columns((3, 3, 3))
-arquivo1 = coluna_1.file_uploader("Upload Arquivo1")#, accept_multiple_files=True)
+arquivo1 = coluna_1.file_uploader("Primeiro Upload do Arquivo")#, accept_multiple_files=True)
 
 data = ''
 tamanho = 1
@@ -35,7 +46,7 @@ resultado = pd.DataFrame()
 if arquivo1 is not None:
     info_Data = pd.read_csv(arquivo1, encoding='ISO-8859-1', header=None)
     if len(info_Data) != 1:
-        arquivo2 = coluna_2.file_uploader("Upload Arquivo2")  # , accept_multiple_files=True)
+        arquivo2 = coluna_2.file_uploader("Segundo Upload do Arquivo")  # , accept_multiple_files=True)
         data = info_Data[0][1]
         if arquivo2 is not None:
             dados = pd.read_csv(arquivo2, delimiter=data, encoding='ISO-8859-1', header=None).iloc[:, 1:].replace(to_replace=',', value=f'{data},', regex=True).transpose().reset_index(drop=True)
@@ -47,8 +58,8 @@ if arquivo1 is not None:
             dados_organizados = organizar_dados.squeeze()
             lista = [re.sub('\u0000', ' ', x.lstrip()) for x in dados_organizados]
     else:
-        arquivo2 = coluna_2.file_uploader("Upload Arquivo2")  # , accept_multiple_files=True)
-        arquivo3 = coluna_3.file_uploader("Upload Arquivo3")  # , accept_multiple_files=True)
+        arquivo2 = coluna_2.file_uploader("Segundo Upload do Arquivo")  # , accept_multiple_files=True)
+        arquivo3 = coluna_3.file_uploader("Terceiro Upload do Arquivo")  # , accept_multiple_files=True)
         if arquivo2 is not None and arquivo3 is not None:
             info_Data2 = pd.read_csv(arquivo2, delimiter='\u0000', encoding='ISO-8859-1', header=None)[144].tolist()[0].split(',')[0]
             data = info_Data2[-8:]
