@@ -29,7 +29,7 @@ def converter_df_excel(df):
 
 observacao = st.checkbox('Mostrar Observações')
 if observacao:
-    st.write('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
+    st.markdown('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
     - 2 vezes, se o arquivo estiver bugado. \n
     - 3 vezes, se o arquivo estiver normal. \n
     - Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa \n
