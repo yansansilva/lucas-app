@@ -27,13 +27,14 @@ def converter_df_excel(df):
     processed_data = output.getvalue()
     return processed_data
 
-obsvervacao = st.checkbox('Mostrar Observações')
+observacao = st.checkbox('Mostrar Observações')
 if observacao:
-    st.markdown('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_**
-    2 vezes, se o arquivo estiver bugado.
-    3 vezes, se o arquivo estiver normal.
-    Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa
-    Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado no formato Excel ou CSV.''')
+    st.write('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
+    - 2 vezes, se o arquivo estiver bugado. \n
+    - 3 vezes, se o arquivo estiver normal. \n
+    - Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa \n
+    - Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado
+    no formato Excel ou CSV.''')
 
 coluna_1, coluna_2, coluna_3 = st.columns((3, 3, 3))
 arquivo1 = coluna_1.file_uploader("Primeiro Upload do Arquivo")#, accept_multiple_files=True)
