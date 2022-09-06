@@ -29,11 +29,11 @@ def converter_df_excel(df):
 
 observacao = st.checkbox('Mostrar Observações')
 if observacao:
-    st.markdown('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
-    - 2 vezes, se o arquivo estiver bugado.
-    - 3 vezes, se o arquivo estiver normal.
-    - Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa
-    - Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado
+    st.write('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
+    2 vezes, se o arquivo estiver bugado. \n
+    3 vezes, se o arquivo estiver normal. \n
+    Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa \n
+    Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado
     no formato Excel ou CSV.''')
 
 coluna_1, coluna_2, coluna_3 = st.columns((3, 3, 3))
@@ -59,10 +59,10 @@ if arquivo1 is not None:
             dados_organizados = organizar_dados.squeeze()
             lista = [re.sub('\u0000', ' ', x.lstrip()) for x in dados_organizados]
     else:
-        arquivo2 = coluna_2.file_uploader("Segundo Upload do Arquivo")  # , accept_multiple_files=True)
-        arquivo3 = coluna_3.file_uploader("Terceiro Upload do Arquivo")  # , accept_multiple_files=True)
+        arquivo2 = coluna_2.file_uploader("Segundo Upload Arquivo")  # , accept_multiple_files=True)
+        arquivo3 = coluna_3.file_uploader("Terceiro Upload Arquivo")  # , accept_multiple_files=True)
         if arquivo2 is not None and arquivo3 is not None:
-            info_Data2 = pd.read_csv(arquivo2, delimiter='\u0000', encoding='ISO-8859-1', header=None)[144].tolist()[0].split(',')[0]
+            info_Data2 = pd.read_csv(arquivo2, delimiter='\u0000', encoding='ISO-8859-1', header=None).squeeze().dropna().reset_index(drop=True)[15].split(',')[0]
             data = info_Data2[-8:]
             dados = pd.read_csv(arquivo3, delimiter=data, encoding='ISO-8859-1', header=None).iloc[:, 2:].replace(to_replace=',', value=f'{data},', regex=True).transpose().reset_index(drop=True).squeeze()
             lista = [re.sub('\u0000', ' ', x.lstrip()) for x in dados]
