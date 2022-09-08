@@ -27,45 +27,41 @@ def converter_df_excel(df):
     processed_data = output.getvalue()
     return processed_data
 
-observacao = st.checkbox('Mostrar Observações')
-if observacao:
-    st.write('''**_Será necessário abrir o mesmo arquivo duas ou três vezes:_** \n
-    2 vezes, se o arquivo estiver bugado. \n
-    3 vezes, se o arquivo estiver normal. \n
-    Quando for feito o upload do arquivo, serão solitadas automaticamente a quantidade de vezes necessária para executar o programa \n
-    Ao término da execução do programa, será possível ver o resultado na própria página da web, além de fazer o download do resultado
-    no formato Excel ou CSV.''')
-
 coluna_1, coluna_2, coluna_3 = st.columns((3, 3, 3))
-arquivo1 = coluna_1.file_uploader("Primeiro Upload do Arquivo")#, accept_multiple_files=True)
+arquivo = coluna_1.file_uploader("Primeiro Upload do Arquivo")#, accept_multiple_files=True)
 
-data = ''
-tamanho = 1
 lista = []
 resultado = pd.DataFrame()
 
-if arquivo1 is not None:
-    info_Data = pd.read_csv(arquivo1, encoding='ISO-8859-1', header=None)
-    if len(info_Data) != 1:
-        arquivo2 = coluna_2.file_uploader("Segundo Upload do Arquivo")  # , accept_multiple_files=True)
-        data = info_Data[0][1]
-        if arquivo2 is not None:
-            dados = pd.read_csv(arquivo2, delimiter=data, encoding='ISO-8859-1', header=None).iloc[:, 1:].replace(to_replace=',', value=f'{data},', regex=True).transpose().reset_index(drop=True)
-            organizar_dados = pd.DataFrame()
-            for x in range(len(dados.columns)):
-                df_auxiliar = pd.DataFrame(dados[x])
-                df_auxiliar.columns = ['0']
-                organizar_dados = pd.concat([organizar_dados, df_auxiliar], ignore_index=True).dropna().reset_index(drop=True)
-            dados_organizados = organizar_dados.squeeze()
-            lista = [re.sub('\u0000', ' ', x.lstrip()) for x in dados_organizados]
+if arquivo is not None:
+    espaco='\u0000'
+    dados_importados = pd.read_csv(arquivo, delimiter=f'No Liner{11*espaco}0.  Water{19*espaco}', encoding='ISO-8859-1', header=None)
+    if len(dados_importados) != 1:
+        dados_concatenados = pd.concat([dados_importados[1], dados_importados[0]], ignore_index=True).dropna().reset_index(drop=True).drop(labels=1).reset_index(drop=True).squeeze()#[0].split(',')
+        dados_em_lista = []
+        for x in range(len(dados_concatenados)):
+            dados_em_lista.append(dados_concatenados[x].split(','))
+        dados_transpostos = pd.DataFrame(dados_em_lista).transpose()
+        dados_concatenados_2 = pd.DataFrame()
+        for x in range(len(dados_transpostos.columns)):
+            dados_concatenados_2 = pd.concat([dados_concatenados_2, pd.DataFrame(dados_transpostos)[x]], ignore_index=True)
+        dados = dados_concatenados_2.dropna().reset_index(drop=True).squeeze().tolist()
     else:
-        arquivo2 = coluna_2.file_uploader("Segundo Upload Arquivo")  # , accept_multiple_files=True)
-        arquivo3 = coluna_3.file_uploader("Terceiro Upload Arquivo")  # , accept_multiple_files=True)
-        if arquivo2 is not None and arquivo3 is not None:
-            info_Data2 = pd.read_csv(arquivo2, delimiter='\u0000', encoding='ISO-8859-1', header=None).squeeze().dropna().reset_index(drop=True)[15].split(',')[0]
-            data = info_Data2[-8:]
-            dados = pd.read_csv(arquivo3, delimiter=data, encoding='ISO-8859-1', header=None).iloc[:, 2:].replace(to_replace=',', value=f'{data},', regex=True).transpose().reset_index(drop=True).squeeze()
-            lista = [re.sub('\u0000', ' ', x.lstrip()) for x in dados]
+        dados = dados_importados.squeeze()[1].split(',')
+
+
+    lista_dados = []
+    for linha, dado in enumerate(dados):
+        if len(dado) > 10:
+            if 0 < linha < len(dados) - 1:
+                if len(dados[linha + 1]) <= 10:
+                    lista_dados.append([f'{dados[linha - 1][-8:]},{dado[:-1]}'])
+                else:
+                    lista_dados.append([f'{dados[linha - 1][-8:]},{dado[:-9]}'])
+            else:
+                lista_dados.append([f'{dados[linha - 1][-8:]},{dado[:-1]}'])
+
+    lista = [re.sub('\u0000', ' ', x.lstrip()) for x in pd.DataFrame(lista_dados).squeeze()]
 
     if lista != []:
         separacao_lista = [[lista[x][0:17], float(lista[x][17:30]), float(lista[x][30:43]), float(lista[x][43:54]), float(lista[x][54:65]), float(lista[x][65:79])] for x in range(len(lista))]
@@ -75,13 +71,18 @@ if arquivo1 is not None:
             st.dataframe(resultado)
 
 if not resultado.empty:
-	st.write("### Salvar Resultados")
+    data = [resultado['data'][resultado.index[0]][:8], resultado['data'][resultado.index[-1]][:8]]
 
-	coluna_nomear_arquivo_1, coluna_nomear_arquivo_2 = st.columns((3, 2))
-	nomearquivo = coluna_nomear_arquivo_1.text_input('Digite um nome para o arquivo:', f'arquivo-{data}_convertido')
+    st.write("### Salvar Resultados")
 
-	coluna_salvar_1, coluna_salvar_2, coluna_salvar_3 = st.columns((2, 2, 6))
-	csv = converter_df_csv(resultado)
-	excel = converter_df_excel(resultado)
-	coluna_salvar_1.download_button(label="Download em CSV", data=csv, file_name=nomearquivo + '.csv', mime='text/csv')
-	coluna_salvar_2.download_button(label="Download em Excel", data=excel, file_name=nomearquivo+'.xlsx', mime='application/vnd.ms-excel')
+    coluna_nomear_arquivo_1, coluna_nomear_arquivo_2 = st.columns((3, 2))
+    if data[0] != data[1]:
+        nomearquivo = coluna_nomear_arquivo_1.text_input('Digite um nome para o arquivo:', f'medição_de_{data[0]}_a_{data[1]}')
+    else:
+        nomearquivo = coluna_nomear_arquivo_1.text_input('Digite um nome para o arquivo:', f'medição_de_{data[0]}')
+
+    coluna_salvar_1, coluna_salvar_2, coluna_salvar_3 = st.columns((2, 2, 6))
+    csv = converter_df_csv(resultado)
+    excel = converter_df_excel(resultado)
+    coluna_salvar_1.download_button(label="Download em CSV", data=csv, file_name=nomearquivo + '.csv', mime='text/csv')
+    coluna_salvar_2.download_button(label="Download em Excel", data=excel, file_name=nomearquivo+'.xlsx', mime='application/vnd.ms-excel')
