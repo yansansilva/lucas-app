@@ -28,7 +28,7 @@ def converter_df_excel(df):
     return processed_data
 
 coluna_1, coluna_2, coluna_3 = st.columns((3, 3, 3))
-arquivo = coluna_1.file_uploader("Primeiro Upload do Arquivo")#, accept_multiple_files=True)
+arquivo = coluna_1.file_uploader("Upload do Arquivo")#, accept_multiple_files=True)
 
 lista = []
 resultado = pd.DataFrame()
