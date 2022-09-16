@@ -47,9 +47,10 @@ if lista_arquivos != []:
         lista = []
         resultado = pd.DataFrame()
 
-        dados_importados = pd.read_csv(arquivo, delimiter=f'No Liner{11*espaco}0.  Water{19*espaco}', encoding='ISO-8859-1', header=None)
+        dados_importados = pd.read_csv(arquivo, delimiter=f'DctP', encoding='ISO-8859-1', header=None)
+        dados_importados[1][0] = dados_importados[1][0][248:]
         if len(dados_importados) != 1:
-            dados_concatenados = pd.concat([dados_importados[1], dados_importados[0]], ignore_index=True).dropna().reset_index(drop=True).drop(labels=1).reset_index(drop=True).squeeze()#[0].split(',')
+            dados_concatenados = pd.concat([dados_importados[1], dados_importados[0]], ignore_index=True).dropna().reset_index(drop=True).drop(labels=1).reset_index(drop=True).squeeze()
             dados_em_lista = []
             for x in range(len(dados_concatenados)):
                 dados_em_lista.append(dados_concatenados[x].split(','))
@@ -60,7 +61,6 @@ if lista_arquivos != []:
             dados = dados_concatenados_2.dropna().reset_index(drop=True).squeeze().tolist()
         else:
             dados = dados_importados.squeeze()[1].split(',')
-
 
         lista_dados = []
         for linha, dado in enumerate(dados):
